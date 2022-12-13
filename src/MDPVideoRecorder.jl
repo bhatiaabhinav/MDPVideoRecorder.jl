@@ -23,13 +23,14 @@ struct VideoRecorder <: AbstractHook
 end
 
 
-function MDPs.preepisode(vr::VideoRecorder; kwargs...)
+function MDPs.preepisode(vr::VideoRecorder; env, kwargs...)
     empty!(vr.frames)
+    push!(vr.frames, convert(Matrix{RGB{Colors.N0f8}}, visualize(env; kwargs...)))
 end
 
 function MDPs.poststep(vr::VideoRecorder; env, returns, kwargs...)
     if length(returns) % vr.interval == 0
-        viz = convert(Matrix{RGB{Colors.N0f8}}, visualize(env))
+        viz = convert(Matrix{RGB{Colors.N0f8}}, visualize(env; kwargs...))
         if vr.display_stats_dict !== nothing
             H, W = size(viz)
             Drawing(W, H, :image)
